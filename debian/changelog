@@ -1,0 +1,15 @@
+golang-jsouthworth-seq (1.0-1) unstable; urgency=medium
+
+  * Initial checkin for sequence library
+  * Don't force users to call Seq on non sequence types to use the
+    library functions
+  * Add README
+  * Fix godoc link in README.md
+  * Add support for Travis CI
+  * Add coverage support
+  * Add build status badge to README
+  * Try to get coveralls working
+  * Expose a function to convert an arbitrary sequence to a string
+  * seq: use dyn.Apply instead of internal implementation
+
+ -- John Southworth <jx756k@att.com>  Fri, 22 Mar 2019 14:24:53 -0700

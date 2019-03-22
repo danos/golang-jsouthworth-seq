@@ -1,0 +1,32 @@
+Source: golang-jsouthworth-seq
+Section: devel
+Priority: extra
+Maintainer: John Southworth <jx756k@att.com>
+Build-Depends:
+ debhelper (>= 9),
+ dh-golang,
+ golang-go,
+ golang-jsouthworth-dyn-dev,
+ golang-jsouthworth-transduce-dev
+Standards-Version: 3.9.8
+Homepage: https://jsouthworth.net/go/seq
+
+Package: golang-jsouthworth-seq-dev
+Architecture: all
+Depends:
+ golang-jsouthworth-dyn-dev,
+ golang-jsouthworth-transduce-dev,
+ ${misc:Depends},
+ ${shlibs:Depends}
+Built-Using: ${misc:Built-Using}
+Description: Lazy sequence library for go
+ Seq is a lazy sequence library for go. It is inspired by Clojure's
+ sequence functions. It originally started because I was interested in
+ transducers and wanted to play with them. Most of the functions in
+ the library are implemeneted as transducers in the
+ jsouthworth.net/go/transduce library and wrapped with a XfrmSequence
+ here. This library relies heavily on reflection to allow for the most
+ flexibility in what the user provides. This means that it is only
+ type checked at runtime.
+ .
+ This package contains the source.
