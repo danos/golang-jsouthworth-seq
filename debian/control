@@ -7,7 +7,8 @@ Build-Depends:
  dh-golang,
  golang-go,
  golang-jsouthworth-dyn-dev,
- golang-jsouthworth-transduce-dev
+ golang-jsouthworth-transduce-dev,
+ golang-jsouthworth-try-dev
 Standards-Version: 3.9.8
 Homepage: https://jsouthworth.net/go/seq
 
@@ -16,6 +17,7 @@ Architecture: all
 Depends:
  golang-jsouthworth-dyn-dev,
  golang-jsouthworth-transduce-dev,
+ golang-jsouthworth-try-dev,
  ${misc:Depends},
  ${shlibs:Depends}
 Built-Using: ${misc:Built-Using}
