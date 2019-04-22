@@ -7,7 +7,6 @@ package seq
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"jsouthworth.net/go/dyn"
@@ -56,31 +55,10 @@ func Conj(coll interface{}, elem interface{}) interface{} {
 	case conjoiner:
 		return v.Conj(elem)
 	default:
-		val := reflect.ValueOf(coll)
-		switch val.Kind() {
-		case reflect.Slice:
-			return sliceConj(val, elem)
-		case reflect.Map:
-			return mapConj(val, elem)
-		default:
-			_ = coll.(conjoiner)
-			return nil
-		}
+		coll := reflectNative(coll)
+		conjer := coll.(conjoiner)
+		return conjer.Conj(elem)
 	}
-}
-
-func sliceConj(coll reflect.Value, elem interface{}) interface{} {
-	return reflect.Append(coll, reflect.ValueOf(elem)).Interface()
-}
-
-func mapConj(coll reflect.Value, elem interface{}) interface{} {
-	entry := elem.(interface {
-		Key() interface{}
-		Value() interface{}
-	})
-	coll.SetMapIndex(reflect.ValueOf(entry.Key()),
-		reflect.ValueOf(entry.Value()))
-	return coll.Interface()
 }
 
 // Into takes an initial collection and a sequence and puts all
@@ -170,15 +148,31 @@ func Reduce(
 	init interface{},
 	coll interface{},
 ) interface{} {
-	f := wrapReduce(fn)
-	//TODO: make a reducer interface to make this efficient
-	s := Seq(coll)
-	if s == nil {
-		return init
+	type reducer interface {
+		Reduce(interface{}, interface{}) interface{}
 	}
-	var ret interface{} = init
+	switch v := coll.(type) {
+	case reducer:
+		return v.Reduce(fn, init)
+	default:
+		coll = reflectNative(coll)
+		switch v := coll.(type) {
+		case reducer:
+			return v.Reduce(fn, init)
+		default:
+			return reduceSeq(wrapReduce(fn), init, Seq(coll))
+		}
+	}
+}
+
+func reduceSeq(
+	fn func(res, in interface{}) interface{},
+	init interface{},
+	s Sequence,
+) interface{} {
+	ret := init
 	for s != nil {
-		ret = f(ret, First(s))
+		ret = fn(ret, First(s))
 		s = Seq(Next(s))
 	}
 	return ret
