@@ -4,7 +4,7 @@ golang-jsouthworth-seq (1.0-4) unstable; urgency=medium
   * seq: allow objects to override the Reduce implementation
   * seq: cleanup reflection for Conj and Reduce
 
- -- John Southworth <jx756k@att.com>  Mon, 22 Apr 2019 08:34:49 -0700
+ -- John Southworth <jx756k@att.com>  Tue, 09 Jul 2019 09:40:18 -0700
 
 golang-jsouthworth-seq (1.0-3) unstable; urgency=medium
 
