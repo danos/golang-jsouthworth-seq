@@ -11,7 +11,6 @@ import (
 
 	"jsouthworth.net/go/dyn"
 	"jsouthworth.net/go/transduce"
-	"jsouthworth.net/go/try"
 )
 
 // Sequence is any type that can return iterate down its elements.
@@ -61,13 +60,22 @@ func Conj(coll interface{}, elem interface{}) interface{} {
 	}
 }
 
+type persistentColl interface {
+	MakeTransient() interface{}
+}
+
+type transientColl interface {
+	MakePersistent() interface{}
+}
+
 // Into takes an initial collection and a sequence and puts all
 // the elements of the sequence into the collection returning the
 // result.
 func Into(to interface{}, from interface{}) interface{} {
-	coll, err := try.Apply(dyn.Send, to, "AsTransient")
-	if err == nil {
-		return dyn.Send(Reduce(Conj, coll, from), "AsPersistent")
+	coll, canTransient := to.(persistentColl)
+	if canTransient {
+		return Reduce(Conj, coll.MakeTransient(), from).(transientColl).
+			MakePersistent()
 	}
 	return Reduce(Conj, to, from)
 }
@@ -80,10 +88,10 @@ func TransformInto(
 	xfrm transduce.Transducer,
 	from interface{},
 ) interface{} {
-	coll, err := try.Apply(dyn.Send, to, "AsTransient")
-	if err == nil {
-		return dyn.Send(
-			Transduce(xfrm, Conj, coll, from), "AsPersistent")
+	coll, canTransient := to.(persistentColl)
+	if canTransient {
+		return Transduce(xfrm, Conj, coll.MakeTransient(), from).(transientColl).
+			MakePersistent()
 	}
 	return Transduce(xfrm, Conj, to, from)
 }
@@ -380,7 +388,7 @@ func Every(pred interface{}, coll interface{}) bool {
 		switch {
 		case s == nil:
 			return true
-		case apply(pred, First(s)).(bool):
+		case wrapPred(pred)(First(s)):
 			s = Next(s)
 		default:
 			return false
@@ -397,7 +405,18 @@ func Some(pred interface{}, coll interface{}) bool {
 	if s == nil {
 		return false
 	}
-	return apply(pred, First(s)).(bool) || Some(pred, Next(s))
+	return wrapPred(pred)(First(s)) || Some(pred, Next(s))
+}
+
+func wrapPred(pred interface{}) func(interface{}) bool {
+	switch fn := pred.(type) {
+	case func(interface{}) bool:
+		return fn
+	default:
+		return func(in interface{}) bool {
+			return apply(fn, in).(bool)
+		}
+	}
 }
 
 // NotEvery is the inverse of Every.
