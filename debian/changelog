@@ -1,3 +1,10 @@
+golang-jsouthworth-seq (1.0.1-1) unstable; urgency=medium
+
+  * seq: use generic versions of transient functions
+  * seq: speedup functions that use predicates.
+
+ -- John Southworth <jx756k@att.com>  Thu, 12 Dec 2019 13:10:41 -0800
+
 golang-jsouthworth-seq (1.0-4) unstable; urgency=medium
 
   * seq: allow go maps to become sequences of MapEntry
